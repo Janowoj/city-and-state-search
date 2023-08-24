@@ -2,7 +2,7 @@ const endpoint = 'https://gist.githubusercontent.com/Miserlou/c5cd8364bf9b2420bb
 
 const cities = [];
 
-// creating an array from the endpoint
+// creating an array from the endpoint (promise)
 fetch(endpoint)
     .then(blob => blob.json())
     .then(data => cities.push(...data));
@@ -26,17 +26,28 @@ function displayPlaces() {
     console.log(matchArray);
     // method that displays the li with the matching places
     const html = matchArray.map(place => {
+        // regex for highlighting the matching places, "gi" stands for "global" and "insensitive", so it matches all the places and is case insensitive
+        const regexTwo = new RegExp(this.value, "gi");
+        const cityName = place.city.replace(regexTwo, `<span class="highlight">${this.value}</span>`);
+        const stateName = place.state.replace(regexTwo, `<span class="highlight>${this.value}</span>`);
+        // now can replace the place.city with cityName and stateName:
         return `
                 <li>
-                    <span class="name">${place.city}, ${place.state}</span>
-                    <span class="name">${place.population}</span>
-                </li>`
+                    <span class="name">${cityName}, ${stateName}</span>
+                    <span class="name">${numberWithCommas(place.population)}</span>
+                </li>
+                `;
         // we have to join the array to get a string
     }).join("");
 
     // ul with class suggestions
     suggestions.innerHTML = html;
 
+}
+
+// function numberWithCommas(x) for adding commas to the population number
+function numberWithCommas(x) {
+    return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 
 const searchInput = document.querySelector("input.search");
